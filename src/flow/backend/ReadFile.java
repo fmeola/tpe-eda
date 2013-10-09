@@ -36,7 +36,7 @@ public class ReadFile {
 				if(Character.isDigit((char)c)) {
 					int color = (char)c - '0';
 					if(count[color] == 2) {
-						throw new IOException();
+						throw new IOException("Error: Mas de 2 fichas de un mismo color.");
 					}
 					else {
 						matrix[i][j++] = color;
@@ -48,12 +48,23 @@ public class ReadFile {
 					if(j == matrix[0].length) {
 						break;
 					} else {
-						throw new IOException();
+						throw new IOException("Error: Numero de columnas incorrecto en la fila " + i);
 					}
 				} else {
-					throw new IOException();
+					throw new IOException("Error: Caracter invalido en la posicion (" + i + "," + j + ")");
 				}
 			}
+			if(c == -1) {
+				if(j != matrix[0].length) {
+					throw new IOException("Error: Faltan caracteres al final de la fila " + i);
+				}
+			}
+		}
+		if(inStream.read() != -1)
+			throw new IOException("El archivo posee datos de mas al final.");
+		for(int i: count) {
+			if(i == 1)
+				throw new IOException("Error: Falta una ficha de un color");
 		}
 		return matrix;
 	}
