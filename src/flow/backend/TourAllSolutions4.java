@@ -27,17 +27,22 @@ public class TourAllSolutions4 {
 
 	private void solve(int color, int row, int col, int endrow, int endcol,
 			List<int[][]> res) {
+		/* Si me choqué con un color distinto al mío me voy. */
 		if (board[row][col] != 0 && board[row][col] != color)
 			return;
+		/* Sino pinto el casillero vacío con mi color. */
 		board[row][col] = color;
+		/* Si llegué a la meta entonces guardo una copia del tablero
+		 * en la lista de soluciones. */
 		if (row == endrow && col == endcol) {
 			int[][] newBoard = new int[rows][cols];
 			for (int i = 0; i < rows; i++) {
 				for (int j = 0; j < cols; j++) {
 					newBoard[i][j] = board[i][j];
 				}
-			}
+			} 
 			res.add(newBoard);
+		/* Sino me llamo recursivamente con cada posible movimiento. */
 		} else {
 			for (int[] move : moves) {
 				int i = row + move[0];
@@ -48,6 +53,7 @@ public class TourAllSolutions4 {
 				}
 			}
 		}
+		/* Backtracking: Me despinto para intentar otro camino. */
 		if (board[row][col] == color)
 			board[row][col] = 0;
 	}
