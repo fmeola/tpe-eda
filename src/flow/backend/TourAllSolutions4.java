@@ -76,9 +76,10 @@ public class TourAllSolutions4 {
 	}
 
 	public static void main(String[] args) {
-		//int[][] startboard = { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 0, 4, 0 },
-		//		{ 0, 0, 0, 3, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-		//		{ 0, 0, 1, 2, 4, 0 }, { 0, 0, 2, 3, 0, 0 } };
+		int[][] startboard = { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 0, 4, 0 },
+				{ 0, 0, 0, 3, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
+				{ 0, 0, 1, 2, 4, 0 }, { 0, 0, 2, 3, 0, 0 } };
+		/*
 		int[][] startboard = { 
 				{0,0,4,0,0,0,2},
 				{0,0,0,0,1,0,0},
@@ -87,6 +88,7 @@ public class TourAllSolutions4 {
 				{0,0,1,3,0,0,0},
 				{0,5,2,0,0,3,0},
 				{0,0,0,4,0,0,0}};
+		*/
 		long lStartTime = new Date().getTime(); // start time
 		TourAllSolutions4 tour = new TourAllSolutions4(startboard);
 		Map<Integer, List<Point>> fichas = new HashMap<Integer, List<Point>>();
@@ -109,13 +111,14 @@ public class TourAllSolutions4 {
 			tour.solve(n, start.x, start.y, end.x, end.y, aux);
 			tour.solvedPaths.put(n, aux);
 			// Arreglar este parche!
-			//int[][] newBoard = { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 0, 4, 0 },
-			//		{ 0, 0, 0, 3, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
-			//		{ 0, 0, 1, 2, 4, 0 }, { 0, 0, 2, 3, 0, 0 } };
-			int[][] newBoard = { { 0, 0, 4, 0, 0, 0, 2 },
+			int[][] newBoard = { { 0, 0, 0, 0, 0, 0 }, { 0, 1, 0, 0, 4, 0 },
+					{ 0, 0, 0, 3, 0, 0 }, { 0, 0, 0, 0, 0, 0 },
+					{ 0, 0, 1, 2, 4, 0 }, { 0, 0, 2, 3, 0, 0 } };
+			/*int[][] newBoard = { { 0, 0, 4, 0, 0, 0, 2 },
 					{ 0, 0, 0, 0, 1, 0, 0 }, { 0, 0, 0, 0, 0, 0, 0 },
 					{ 0, 0, 0, 5, 0, 0, 0 }, { 0, 0, 1, 3, 0, 0, 0 },
 					{ 0, 5, 2, 0, 0, 3, 0 }, { 0, 0, 0, 4, 0, 0, 0 } };
+			*/
 			tour.setBoard(newBoard);
 		}
 		for (Integer k : tour.solvedPaths.keySet()) {
