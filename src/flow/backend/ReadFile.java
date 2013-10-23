@@ -43,7 +43,7 @@ public class ReadFile {
 						count[color]++;
 					}
 				} else if((char)c == ' ') {
-					matrix[i][j++] = -1;
+					matrix[i][j++] = 0;
 				} else if((char)c == '\n') {
 					if(j == matrix[0].length) {
 						break;
@@ -89,6 +89,7 @@ public class ReadFile {
 				if (Character.isDigit((char) c)) {
 					dimColumns = dimColumns * 10 + c - '0';
 				} else if(!Character.isSpaceChar((char)c)) {
+					System.out.println(c);
 					throw new IOException();
 				}
 				break;
