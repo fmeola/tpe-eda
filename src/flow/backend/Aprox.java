@@ -14,16 +14,17 @@ public class Aprox {
 		Solution localSolution;
 		long elapsedTime = 0;
 		maxTime += new Date().getTime();
-		boolean firsttime = true;
+		boolean firstTime = true;
 		while (elapsedTime < maxTime) {
-			localSolution = randomSolution(solver);
-			if (firsttime) {
+			if (firstTime) {
+				localSolution = firstSolution(solver);
 				System.out.println("Soluci—n Base: " + localSolution.evaluate()
 						+ " celdas pintadas.");
 				localSolution.printSolution();
-				firsttime = false;
+				firstTime = false;
 				System.out.println();
-			}
+			} else
+				localSolution = randomSolution(solver);
 			localSolutionEval = localSolution.evaluate();
 			do {
 				better = false;
@@ -54,12 +55,17 @@ public class Aprox {
 	}
 
 	private Solution randomSolution(Solver solver) {
-		solver.solve(false);
+		solver.solve(false, false);
+		return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
+	}
+	
+	private Solution firstSolution(Solver solver) {
+		solver.solve(false, true);
 		return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
 	}
 
 	public static void main(String[] args) throws IOException {
-		int[][] startboard = ReadFile.readFile("grids/francogrids/5x10");
+		int[][] startboard = ReadFile.readFile("grids/otros/inconcluso");
 		long lStartTime = new Date().getTime();
 		Aprox aprox = new Aprox();
 		aprox.solver = new Solver(startboard);

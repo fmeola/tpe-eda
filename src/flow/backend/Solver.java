@@ -12,8 +12,9 @@ public class Solver {
 	private int[][] board;
 	private int[][] solvedBoard;
 	private Map<Integer, List<Point>> colors;
-	private Map<Integer, int[][]> movesmap;
+	private Map<Integer, int[][]> movesMap;
 	private int paintedCells;
+	private int[][] movesPriority = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 
 	public Solver(int[][] startboard) {
 		this.rows = startboard.length;
@@ -36,7 +37,7 @@ public class Solver {
 		}
 		this.colors = colors;
 
-		this.movesmap = new HashMap<Integer, int[][]>();
+		this.movesMap = new HashMap<Integer, int[][]>();
 		int[][] moves = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 		int m = 0;
 		for (int i = 0; i < 4; i++)
@@ -51,16 +52,16 @@ public class Solver {
 									aux[1] = moves[j];
 									aux[2] = moves[k];
 									aux[3] = moves[l];
-									movesmap.put(m++, aux);
+									movesMap.put(m++, aux);
 								}
 
 		this.paintedCells = 0;
 	}
 
-	public boolean solve(boolean bestSolution) {
+	public boolean solve(boolean bestSolution, boolean priorityMoves) {
 		return solve(1, colors.get(1).get(0).x, colors.get(1).get(0).y, colors
 				.get(1).get(1).x, colors.get(1).get(1).y, colors.size() * 2,
-				bestSolution, colors.size());
+				bestSolution, colors.size(), priorityMoves);
 	}
 
 	public boolean solveAprox(int color) {
@@ -72,21 +73,21 @@ public class Solver {
 		colors = oneColor;
 		return solve(color, colors.get(color).get(0).x, colors.get(color)
 				.get(0).y, colors.get(color).get(1).x,
-				colors.get(color).get(1).y, getPaintedCells(), false, color);
+				colors.get(color).get(1).y, getPaintedCells(), false, color, false);
 	}
 
 	private boolean solve(int color, int currentRow, int currentCol,
 			int endRow, int endCol, int paintedCells, boolean bestSolution,
-			int maxColor) {
-		int[][] moves = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
-		if (!bestSolution)
-			moves = movesmap.get((int) (Math.random() * 24));
+			int maxColor, boolean priorityMoves) {
+		int[][] moves = movesPriority;
+		if (!priorityMoves)
+			moves = movesMap.get((int) (Math.random() * 24));
 		if (currentRow == endRow && currentCol == endCol) {
 			if (color < colors.size()) {
 				Point start = colors.get(color + 1).get(0);
 				Point end = colors.get(color + 1).get(1);
 				if (solve(color + 1, start.x, start.y, end.x, end.y,
-						paintedCells, bestSolution, maxColor))
+						paintedCells, bestSolution, maxColor, priorityMoves))
 					return true;
 			}
 			if (maxColor == color) {
@@ -114,14 +115,20 @@ public class Solver {
 				paintedCells++;
 			}
 
-			for (int[] move : moves) {
-				int i = currentRow + move[0];
-				int j = currentCol + move[1];
+			for (int k = 0; k < moves.length; k++) {
+				int i = currentRow + moves[k][0];
+				int j = currentCol + moves[k][1];
 				if (i >= 0 && i < rows && j >= 0 && j < cols
 						&& ((board[i][j] == 0) || (i == endRow && j == endCol))) {
 					if (solve(color, i, j, endRow, endCol, paintedCells,
-							bestSolution, maxColor))
+							bestSolution, maxColor, priorityMoves)) {
+						if(priorityMoves) {
+							int[] backup = movesPriority[0];
+							movesPriority[0] = moves[k];
+							movesPriority[k] = backup;
+						}
 						return true;
+					}
 				}
 			}
 			if (flag) {
