@@ -1,96 +1,105 @@
 package flow.backend;
 
 import java.awt.Point;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Solver {
-	/* Idea: Soluci—n Ej 3, Pr‡ctica 9 */
-	private int[][] board;
-	private int[][] auxMatrix;
 	private int rows;
 	private int cols;
-	private Map<Integer, List<Point>> fichas;
-	private int lastPainted;
+	private int[][] board;
+	private int[][] solvedBoard;
+	private Map<Integer, List<Point>> colors;
 	private Map<Integer, int[][]> movesmap;
+	private int paintedCells;
 
 	public Solver(int[][] startboard) {
-		this.setRows(startboard.length);
-		this.setCols(startboard[0].length);
-		this.setBoard(startboard);
-		Map<Integer, List<Point>> fichas = new HashMap<Integer, List<Point>>();
-		for (int i = 0; i < getRows(); i++) {
-			for (int j = 0; j < getCols(); j++) {
+		this.rows = startboard.length;
+		this.cols = startboard[0].length;
+		this.board = startboard;
+		this.solvedBoard = new int[rows][cols];
+
+		Map<Integer, List<Point>> colors = new HashMap<Integer, List<Point>>();
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				if (startboard[i][j] != 0) {
-					if (!fichas.containsKey(startboard[i][j])) {
-						fichas.put(startboard[i][j], new ArrayList<Point>());
-						fichas.get(startboard[i][j]).add(0, new Point(i, j));
+					if (!colors.containsKey(startboard[i][j])) {
+						colors.put(startboard[i][j], new ArrayList<Point>());
+						colors.get(startboard[i][j]).add(0, new Point(i, j));
 					} else {
-						fichas.get(startboard[i][j]).add(1, new Point(i, j));
+						colors.get(startboard[i][j]).add(1, new Point(i, j));
 					}
 				}
 			}
 		}
-		this.setFichas(fichas);
-		this.setAuxMatrix(new int[getRows()][getCols()]);
-		this.setLastPainted(0);
-		this.movesmap = new HashMap<Integer,int[][]>();
-		int[][] moves = {{1,0},{-1,0},{0,1},{0,-1}};
+		this.colors = colors;
+
+		this.movesmap = new HashMap<Integer, int[][]>();
+		int[][] moves = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
 		int m = 0;
-		for(int i = 0; i < 4; i++)
-			for(int j = 0; j< 4; j++)
-				if(j != i)
-				for(int k = 0; k < 4; k++)
-					if( k!=j && k!=i)
-					for(int l = 0; l < 4; l++)
-						if(l!=k && l!=i && l !=j){
-							int[][] aux = new int[4][2];
-							aux[0] = moves[i];
-							aux[1] = moves[j];
-							aux[2] = moves[k];
-							aux[3] = moves[l];
-							movesmap.put(m++,aux);
-						}
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				if (j != i)
+					for (int k = 0; k < 4; k++)
+						if (k != j && k != i)
+							for (int l = 0; l < 4; l++)
+								if (l != k && l != i && l != j) {
+									int[][] aux = new int[4][2];
+									aux[0] = moves[i];
+									aux[1] = moves[j];
+									aux[2] = moves[k];
+									aux[3] = moves[l];
+									movesmap.put(m++, aux);
+								}
+
+		this.paintedCells = 0;
 	}
 
-	public boolean solve(int painted, boolean bestSolution) {
-		return solve(1, getFichas().get(1).get(0).x, getFichas().get(1).get(0).y, getFichas()
-				.get(1).get(1).x, getFichas().get(1).get(1).y, painted, bestSolution, getFichas().size());
-	}
-	
-	public boolean solveAprox(int painted, int color) {
-		return solve(color, getFichas().get(color).get(0).x, getFichas().get(color).get(0).y, getFichas()
-				.get(color).get(1).x, getFichas().get(color).get(1).y, painted, false, color);
+	public boolean solve(boolean bestSolution) {
+		return solve(1, colors.get(1).get(0).x, colors.get(1).get(0).y, colors
+				.get(1).get(1).x, colors.get(1).get(1).y, colors.size() * 2,
+				bestSolution, colors.size());
 	}
 
-	private boolean solve(int color, int row, int col, int endrow, int endcol,
-			int painted, boolean bestSolution, int maxColor) {
-		int[][] moves = movesmap.get((int)(Math.random()*24));//{{1,0},{-1,0},{0,1},{0,-1}}; 
-		if (row == endrow && col == endcol) {
+	public boolean solveAprox(int color) {
+		Map<Integer, List<Point>> oneColor = new HashMap<Integer, List<Point>>();
+		List<Point> oneColorPoints = new ArrayList<Point>();
+		oneColorPoints.add(0, colors.get(color).get(0));
+		oneColorPoints.add(1, colors.get(color).get(1));
+		oneColor.put(color, oneColorPoints);
+		colors = oneColor;
+		return solve(color, colors.get(color).get(0).x, colors.get(color)
+				.get(0).y, colors.get(color).get(1).x,
+				colors.get(color).get(1).y, getPaintedCells(), false, color);
+	}
 
-			if (color < getFichas().size()) {
-				Point start = getFichas().get(color + 1).get(0);
-				Point end = getFichas().get(color + 1).get(1);
-				if (solve(color + 1, start.x, start.y, end.x, end.y, painted,
-						bestSolution, maxColor))
+	private boolean solve(int color, int currentRow, int currentCol,
+			int endRow, int endCol, int paintedCells, boolean bestSolution,
+			int maxColor) {
+		int[][] moves = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+		if (!bestSolution)
+			moves = movesmap.get((int) (Math.random() * 24));
+		if (currentRow == endRow && currentCol == endCol) {
+			if (color < colors.size()) {
+				Point start = colors.get(color + 1).get(0);
+				Point end = colors.get(color + 1).get(1);
+				if (solve(color + 1, start.x, start.y, end.x, end.y,
+						paintedCells, bestSolution, maxColor))
 					return true;
 			}
 			if (maxColor == color) {
-				if (painted == getRows() * getCols()) {
-					setAuxMatrix(getBoard());
+				if (paintedCells == rows * cols) {
+					solvedBoard = board;
 					return true;
 				} else {
-					if (painted > getLastPainted()) {
-						for (int i = 0; i < getRows(); i++) {
-							for (int j = 0; j < getCols(); j++)
-								getAuxMatrix()[i][j] = getBoard()[i][j];
+					if (paintedCells > this.paintedCells) {
+						for (int i = 0; i < rows; i++) {
+							for (int j = 0; j < cols; j++)
+								solvedBoard[i][j] = board[i][j];
 						}
-						setLastPainted(painted);
-
+						this.paintedCells = paintedCells;
 					}
 					if (!bestSolution)
 						return true;
@@ -99,78 +108,68 @@ public class Solver {
 			return false;
 		} else {
 			boolean flag = false;
-			if (getBoard()[row][col] == 0) {
-				getBoard()[row][col] = color;
+			if (board[currentRow][currentCol] == 0) {
+				board[currentRow][currentCol] = color;
 				flag = true;
-				painted++;
+				paintedCells++;
 			}
 
 			for (int[] move : moves) {
-				int i = row + move[0];
-				int j = col + move[1];
-				if (i >= 0 && i < getRows() && j >= 0 && j < getCols()
-						&& ((getBoard()[i][j] == 0) || (i == endrow && j == endcol))) {
-					if (solve(color, i, j, endrow, endcol, painted,
+				int i = currentRow + move[0];
+				int j = currentCol + move[1];
+				if (i >= 0 && i < rows && j >= 0 && j < cols
+						&& ((board[i][j] == 0) || (i == endRow && j == endCol))) {
+					if (solve(color, i, j, endRow, endCol, paintedCells,
 							bestSolution, maxColor))
 						return true;
 				}
 			}
 			if (flag) {
-				getBoard()[row][col] = 0;
-				painted--;
+				board[currentRow][currentCol] = 0;
+				paintedCells--;
 			}
 			return false;
 		}
 	}
 
-	public Map<Integer, List<Point>> getFichas() {
-		return fichas;
+	public int[][] getSolvedBoard() {
+		return solvedBoard;
 	}
 
-	public void setFichas(Map<Integer, List<Point>> fichas) {
-		this.fichas = fichas;
+	public int getFichasSize() {
+		return colors.size();
 	}
 
-	public int[][] getAuxMatrix() {
-		return auxMatrix;
+	public int getPaintedCells() {
+		return paintedCells;
 	}
 
-	public void setAuxMatrix(int[][] auxMatrix) {
-		this.auxMatrix = auxMatrix;
+	public void printBoard() {
+		for (int[] x : solvedBoard) {
+			for (int y : x)
+				System.out.printf("%2d", y);
+			System.out.println();
+		}
 	}
 
-	public int getLastPainted() {
-		return lastPainted;
-	}
-
-	public void setLastPainted(int lastPainted) {
-		this.lastPainted = lastPainted;
-	}
-
-	public int getCols() {
-		return cols;
-	}
-
-	public void setCols(int cols) {
-		this.cols = cols;
-	}
-
-	public int getRows() {
+	public int getBoardRows() {
 		return rows;
 	}
 
-	public void setRows(int rows) {
-		this.rows = rows;
+	public int getBoardCols() {
+		return cols;
 	}
 
-	public int[][] getBoard() {
-		return board;
+	public Iterable<Integer> getAllColors() {
+		return colors.keySet();
 	}
 
-	public void setBoard(int[][] board) {
-		this.board = board;
+	public Point getStartColorPosition(int color) {
+		return colors.get(color).get(0);
 	}
 
+	public Point getEndColorPosition(int color) {
+		return colors.get(color).get(1);
+	}
 
-	
 }

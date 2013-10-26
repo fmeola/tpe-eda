@@ -3,12 +3,11 @@ package flow.backend;
 import java.io.IOException;
 import java.util.Date;
 
-public class AproxAlgorithm {
-	
-	private int bestSolutionEval; 
+public class Aprox {
+	private int bestSolutionEval;
 	private Solution bestSolution;
 	private Solver solver;
-	
+
 	public void solve(long maxTime) {
 		boolean better = false;
 		int neighborEval, localSolutionEval;
@@ -16,11 +15,12 @@ public class AproxAlgorithm {
 		long elapsedTime = 0;
 		maxTime += new Date().getTime();
 		boolean firsttime = true;
-		while(elapsedTime < maxTime) {
+		while (elapsedTime < maxTime) {
 			localSolution = randomSolution(solver);
-			if(firsttime) {
-				System.out.println("primera solucion:"+ localSolution.evaluate());
-				localSolution.print();
+			if (firsttime) {
+				System.out.println("Soluci—n Base: " + localSolution.evaluate()
+						+ " celdas pintadas.");
+				localSolution.printSolution();
 				firsttime = false;
 				System.out.println();
 			}
@@ -37,25 +37,31 @@ public class AproxAlgorithm {
 				}
 			} while (better);
 			if (localSolutionEval > bestSolutionEval) {
-				System.out.println("local: " + localSolutionEval + " best: " + bestSolutionEval);
+				if (localSolutionEval == localSolution.getCellsSize()) {
+					System.out
+							.println("Felicitaciones!: Ha llegado a la soluci—n exacta.");
+					localSolution.printSolution();
+					return;
+				}
+				System.out.println("Mejor Soluci—n Encontrada: "
+						+ localSolutionEval + " celdas pintadas.");
 				bestSolutionEval = localSolutionEval;
 				bestSolution = localSolution;
 			}
 			elapsedTime = new Date().getTime();
 		}
-		bestSolution.print();
+		bestSolution.printSolution();
 	}
 
 	private Solution randomSolution(Solver solver) {
-		solver.solve(solver.getLastPainted(), false);
-		int[][] endboard = solver.getAuxMatrix();
-		return new Solution(endboard, solver.getLastPainted());
+		solver.solve(false);
+		return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
 	}
-	
+
 	public static void main(String[] args) throws IOException {
-		int[][] startboard = ReadFile.readFile("grids/numberlinkgrids/mastermindlevel10016x16");
+		int[][] startboard = ReadFile.readFile("grids/francogrids/5x10");
 		long lStartTime = new Date().getTime();
-		AproxAlgorithm aprox = new AproxAlgorithm();
+		Aprox aprox = new Aprox();
 		aprox.solver = new Solver(startboard);
 		aprox.solve(20000);
 		long lEndTime = new Date().getTime();
