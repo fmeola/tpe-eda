@@ -1,10 +1,12 @@
-package FrontEnd;
+package flow.FrontEnd;
+
+import java.io.IOException;
 
 public class Game {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, InterruptedException {
 
-		boolean progress =false;
+		boolean progress = false;
 		int maxTime = 0;
 		boolean BestSolution = true;
 		String FileRoute;
@@ -13,7 +15,7 @@ public class Game {
 			FileRoute = args[0];
 		else
 			return;
-		
+
 		if (args.length >= 2)
 			if (args[1].equals("exact"))
 				BestSolution = true;
@@ -23,21 +25,21 @@ public class Game {
 				return;
 
 		if (args.length >= 3)
-			if(!BestSolution)
+			if (!BestSolution)
 				maxTime = Integer.parseInt(args[2]);
-			else
-				if(args[2].equals("progress"))
-					progress = true;
-				else
-					return;
-		
-		if (args.length >= 4)
-			if(args[3].equals("progress"))
+			else if (args[2].equals("progress"))
 				progress = true;
 			else
-				return;			
+				return;
 
-		GameFrame main= new GameFrame("Flow", FileRoute, BestSolution, maxTime, progress);
+		if (args.length >= 4)
+			if (args[3].equals("progress"))
+				progress = true;
+			else
+				return;
+
+		GameFrame main = new GameFrame("Flow",FileRoute, BestSolution,
+				maxTime, progress);
 		main.setVisible(true);
 	}
 }

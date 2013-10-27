@@ -4,6 +4,8 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JPanel;
+
 public class Solution {
 
 	private int[][] board;
@@ -45,7 +47,7 @@ public class Solution {
 			auxBoard[startColor.x][startColor.y] = currentColor;
 			Point endColor = s.getEndColorPosition(currentColor);
 			auxBoard[endColor.x][endColor.y] = currentColor;
-			Solver solve = new Solver(auxBoard);
+			Solver solve = new Solver(auxBoard,false, new JPanel());
 			solve.solveAprox(currentColor);
 			evaluate();
 			neighborsList

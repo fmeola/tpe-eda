@@ -6,6 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import flow.gui.BoardPanel;
+
 public class Solver {
 	private int rows;
 	private int cols;
@@ -15,8 +21,11 @@ public class Solver {
 	private Map<Integer, int[][]> movesMap;
 	private int paintedCells;
 	private int[][] movesPriority = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
-
-	public Solver(int[][] startboard) {
+	private boolean progress;
+	private BoardPanel mainPanel;
+	private JFrame lastFrame;
+	
+	public Solver(int[][] startboard, boolean progress, BoardPanel mainPanel) {
 		this.rows = startboard.length;
 		this.cols = startboard[0].length;
 		this.board = startboard;
@@ -56,15 +65,17 @@ public class Solver {
 								}
 
 		this.paintedCells = 0;
+		this.progress = progress;
+		this.mainPanel=mainPanel;
 	}
 
-	public boolean solve(boolean bestSolution, boolean priorityMoves) {
+	public boolean solve(boolean bestSolution, boolean priorityMoves) throws InterruptedException {
 		return solve(1, colors.get(1).get(0).x, colors.get(1).get(0).y, colors
 				.get(1).get(1).x, colors.get(1).get(1).y, colors.size() * 2,
 				bestSolution, colors.size(), priorityMoves);
 	}
 
-	public boolean solveAprox(int color) {
+	public boolean solveAprox(int color) throws InterruptedException {
 		Map<Integer, List<Point>> oneColor = new HashMap<Integer, List<Point>>();
 		List<Point> oneColorPoints = new ArrayList<Point>();
 		oneColorPoints.add(0, colors.get(color).get(0));
@@ -78,11 +89,14 @@ public class Solver {
 
 	private boolean solve(int color, int currentRow, int currentCol,
 			int endRow, int endCol, int paintedCells, boolean bestSolution,
-			int maxColor, boolean priorityMoves) {
+			int maxColor, boolean priorityMoves) throws InterruptedException {
 		int[][] moves = movesPriority;
 		if (!priorityMoves)
 			moves = movesMap.get((int) (Math.random() * 24));
 		if (currentRow == endRow && currentCol == endCol) {
+			
+				printTempBoard();
+			
 			if (color < colors.size()) {
 				Point start = colors.get(color + 1).get(0);
 				Point end = colors.get(color + 1).get(1);
@@ -157,6 +171,23 @@ public class Solver {
 				System.out.printf("%2d", y);
 			System.out.println();
 		}
+	}
+	
+	public void printTempBoard() throws InterruptedException {
+		lastFrame = new JFrame();
+		lastFrame.setSize(500, 800);
+		mainPanel.setBoard(board);
+		lastFrame.add(mainPanel);
+		mainPanel.setVisible(true);
+		lastFrame.setVisible(true);
+		Thread.sleep(50);
+		for (int[] x : board) {
+			for (int y : x)
+				System.out.printf("%2d", y);
+			System.out.println();
+		}
+		System.out.println();
+		lastFrame.setVisible(false);
 	}
 
 	public int getBoardRows() {

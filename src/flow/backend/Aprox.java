@@ -6,7 +6,7 @@ import java.util.Date;
 public class Aprox {
 	private int bestSolutionEval;
 	private Solution bestSolution;
-	private Solver solver;
+	public Solver solver;
 
 	public void solve(long maxTime) {
 		boolean better = false;
@@ -64,14 +64,4 @@ public class Aprox {
 		return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
 	}
 
-	public static void main(String[] args) throws IOException {
-		int[][] startboard = ReadFile.readFile("grids/otros/inconcluso");
-		long lStartTime = new Date().getTime();
-		Aprox aprox = new Aprox();
-		aprox.solver = new Solver(startboard);
-		aprox.solve(20000);
-		long lEndTime = new Date().getTime();
-		long difference = lEndTime - lStartTime;
-		System.out.println("Milisegundos transcurridos: " + difference + ".");
-	}
 }

@@ -1,4 +1,4 @@
-package gui;
+package flow.gui;
 
 import java.awt.Color;
 import java.awt.Image;
@@ -15,7 +15,8 @@ import javax.imageio.ImageIO;
 public class ImageUtils {
 
 	/**
-	 * Carga una imagen y retorna una instancia de la misma. Si hay algun problema al leer el archivo lanza una excepcion.
+	 * Carga una imagen y retorna una instancia de la misma. Si hay algun
+	 * problema al leer el archivo lanza una excepcion.
 	 */
 	public static Image loadImage(String fileName) throws IOException {
 		InputStream stream = ClassLoader.getSystemResourceAsStream(fileName);
@@ -30,7 +31,8 @@ public class ImageUtils {
 	 * Dada una imagen en escala de grises, la tiñe con el color indicado.
 	 */
 	public static Image colorize(Image image, Color color) {
-		BufferedImage result = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		BufferedImage result = new BufferedImage(image.getWidth(null),
+				image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
 		result.getGraphics().drawImage(image, 0, 0, null);
 
 		for (int x = 0; x < image.getWidth(null); x++) {
@@ -39,7 +41,9 @@ public class ImageUtils {
 
 				if (c.getAlpha() != 0) {
 					double r = c.getGreen() / 255.0;
-					Color c2 = new Color((int) (r * color.getRed()), (int) (r * color.getGreen()), (int) (r * color.getBlue()));
+					Color c2 = new Color((int) (r * color.getRed()),
+							(int) (r * color.getGreen()),
+							(int) (r * color.getBlue()));
 					result.setRGB(x, y, c2.getRGB());
 				}
 			}
