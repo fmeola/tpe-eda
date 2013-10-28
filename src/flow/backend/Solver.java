@@ -2,6 +2,7 @@ package flow.backend;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ public class Solver {
 	private Map<Integer, int[][]> movesMap;
 	private int paintedCells;
 	private int[][] movesPriority = {{ 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }};
+	private long maxTime = 0;
 
 	public Solver(int[][] startboard) {
 		this.rows = startboard.length;
@@ -89,6 +91,8 @@ public class Solver {
 	private boolean solve(int color, int currentRow, int currentCol,
 			int endRow, int endCol, int paintedCells, boolean bestSolution,
 			int maxColor, boolean priorityMoves) {
+		if(maxTime != 0 && new Date().getTime() > maxTime)
+			return false;
 		int[][] moves = movesPriority;
 		if (!priorityMoves)
 			moves = movesMap.get((int) (Math.random() * 24));
@@ -206,6 +210,10 @@ public class Solver {
 
 	public Point getEndColorPosition(int color) {
 		return colors.get(color).get(1);
+	}
+
+	public void setMaxTime(long maxTime) {
+		this.maxTime = maxTime;
 	}
 
 }
