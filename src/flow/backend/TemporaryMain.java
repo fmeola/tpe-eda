@@ -5,36 +5,40 @@ import java.util.Date;
 
 public class TemporaryMain {
 	/* Exacto */
-	/*
+	
 	public static void main(String[] args) {
 		int[][] startboard = null;
 		try {
-			startboard = ReadFile.readFile("grids/flowgrids/level306x6");
+			startboard = ReadFile.readFile("grids/francogrids/5x4SinSolucion");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		long lStartTime = new Date().getTime();
 		Solver s = new Solver(startboard);
-		s.solve(true, true);
+		if(!s.solve(true, true)) {
+			System.out.println("Lo sentimos, este tablero no tiene soluci—n.");
+			return;
+		}
 		long lEndTime = new Date().getTime();
 		long difference = lEndTime - lStartTime;
 		s.printBoard();
 		System.out.println("Milisegundos transcurridos: " + difference);
 	}
-	*/
+	/*
 	public static void main(String[] args) {
 		int[][] startboard = null;
 		try {
-			startboard = ReadFile.readFile("grids/francogrids/15x15");
+			startboard = ReadFile.readFile("grids/numberlinkgrids/mastermindlevel10016x16");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		long lStartTime = new Date().getTime();
 		Solver s = new Solver(startboard);
 		Approx a = new Approx(s);
-		a.solve(6000);
+		a.solve(5000);
 		long lEndTime = new Date().getTime();
 		long difference = lEndTime - lStartTime;
 		System.out.println("Milisegundos transcurridos: " + difference);
 	}
+	*/
 }

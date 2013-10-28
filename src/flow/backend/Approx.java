@@ -17,10 +17,15 @@ public class Approx {
 		Solution localSolution;
 		long elapsedTime = 0;
 		maxTime += new Date().getTime();
+		solver.setMaxTime(maxTime);
 		boolean firstTime = true;
 		while (elapsedTime < maxTime) {
 			if (firstTime) {
 				localSolution = firstSolution(solver);
+				if(localSolution == null) {
+					System.out.println("Lo sentimos, intente con m‡s tiempo.");
+					return;
+				}
 				System.out.println("Soluci—n Base: " + localSolution.evaluate()
 						+ " celdas pintadas.");
 				localSolution.printSolution();
@@ -63,8 +68,9 @@ public class Approx {
 	}
 	
 	private Solution firstSolution(Solver solver) {
-		solver.solve(false, true);
-		return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
+		if(solver.solve(false, true))
+			return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
+		return null;
 	}
 
 }
