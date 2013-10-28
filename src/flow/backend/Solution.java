@@ -4,8 +4,6 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JPanel;
-
 public class Solution {
 
 	private int[][] board;
@@ -20,7 +18,7 @@ public class Solution {
 		int painted = 0;
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++)
-				if (board[i][j] != 0) {
+				if (board[i][j] != -1) {
 					painted++;
 				}
 		}
@@ -38,7 +36,7 @@ public class Solution {
 			for (int i = 0; i < rows; i++) {
 				for (int j = 0; j < cols; j++)
 					if (currentBoard[i][j] == currentColor) {
-						auxBoard[i][j] = 0;
+						auxBoard[i][j] = -1;
 					} else {
 						auxBoard[i][j] = currentBoard[i][j];
 					}
@@ -47,7 +45,7 @@ public class Solution {
 			auxBoard[startColor.x][startColor.y] = currentColor;
 			Point endColor = s.getEndColorPosition(currentColor);
 			auxBoard[endColor.x][endColor.y] = currentColor;
-			Solver solve = new Solver(auxBoard,false, new JPanel());
+			Solver solve = new Solver(auxBoard);
 			solve.solveAprox(currentColor);
 			evaluate();
 			neighborsList
@@ -58,8 +56,12 @@ public class Solution {
 
 	public void printSolution() {
 		for (int[] x : board) {
-			for (int y : x)
-				System.out.printf("%2d", y);
+			for (int y : x) {
+				if(y == -1)
+					System.out.print("  ");
+				else
+					System.out.printf("%2d", y);
+			}
 			System.out.println();
 		}
 	}

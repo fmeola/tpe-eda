@@ -6,12 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.Timer;
-
-import flow.gui.BoardPanel;
-
 public class Solver {
 	private int rows;
 	private int cols;
@@ -20,12 +14,9 @@ public class Solver {
 	private Map<Integer, List<Point>> colors;
 	private Map<Integer, int[][]> movesMap;
 	private int paintedCells;
-	private int[][] movesPriority = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
-	private boolean progress;
-	private BoardPanel mainPanel;
-	private JFrame lastFrame;
-	
-	public Solver(int[][] startboard, boolean progress, BoardPanel mainPanel) {
+	private int[][] movesPriority = {{ 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }};
+
+	public Solver(int[][] startboard) {
 		this.rows = startboard.length;
 		this.cols = startboard[0].length;
 		this.board = startboard;
@@ -34,7 +25,7 @@ public class Solver {
 		Map<Integer, List<Point>> colors = new HashMap<Integer, List<Point>>();
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				if (startboard[i][j] != 0) {
+				if (startboard[i][j] != -1) {
 					if (!colors.containsKey(startboard[i][j])) {
 						colors.put(startboard[i][j], new ArrayList<Point>());
 						colors.get(startboard[i][j]).add(0, new Point(i, j));
@@ -65,17 +56,24 @@ public class Solver {
 								}
 
 		this.paintedCells = 0;
-		this.progress = progress;
-		this.mainPanel=mainPanel;
 	}
 
-	public boolean solve(boolean bestSolution, boolean priorityMoves) throws InterruptedException {
-		return solve(1, colors.get(1).get(0).x, colors.get(1).get(0).y, colors
-				.get(1).get(1).x, colors.get(1).get(1).y, colors.size() * 2,
-				bestSolution, colors.size(), priorityMoves);
+	public boolean solve(boolean bestSolution, boolean priorityMoves) {
+		int min, max;
+		min = 9;
+		max = 0;
+		for(int color : colors.keySet()) {
+			if(color < min)
+				min = color;
+			if(color > max)
+				max = color;
+		}
+		return solve(min, colors.get(min).get(0).x, colors.get(min).get(0).y, colors
+				.get(min).get(1).x, colors.get(min).get(1).y, colors.size() * 2,
+				bestSolution, max, priorityMoves);
 	}
 
-	public boolean solveAprox(int color) throws InterruptedException {
+	public boolean solveAprox(int color) {
 		Map<Integer, List<Point>> oneColor = new HashMap<Integer, List<Point>>();
 		List<Point> oneColorPoints = new ArrayList<Point>();
 		oneColorPoints.add(0, colors.get(color).get(0));
@@ -84,23 +82,24 @@ public class Solver {
 		colors = oneColor;
 		return solve(color, colors.get(color).get(0).x, colors.get(color)
 				.get(0).y, colors.get(color).get(1).x,
-				colors.get(color).get(1).y, getPaintedCells(), false, color, false);
+				colors.get(color).get(1).y, getPaintedCells(), false, color,
+				false);
 	}
 
 	private boolean solve(int color, int currentRow, int currentCol,
 			int endRow, int endCol, int paintedCells, boolean bestSolution,
-			int maxColor, boolean priorityMoves) throws InterruptedException {
+			int maxColor, boolean priorityMoves) {
 		int[][] moves = movesPriority;
 		if (!priorityMoves)
 			moves = movesMap.get((int) (Math.random() * 24));
 		if (currentRow == endRow && currentCol == endCol) {
-			
-				printTempBoard();
-			
-			if (color < colors.size()) {
-				Point start = colors.get(color + 1).get(0);
-				Point end = colors.get(color + 1).get(1);
-				if (solve(color + 1, start.x, start.y, end.x, end.y,
+			if (color < maxColor) {
+				int nextColor = color + 1;
+				while(!colors.containsKey(nextColor))
+					nextColor++;
+				Point start = colors.get(nextColor).get(0);
+				Point end = colors.get(nextColor).get(1);
+				if (solve(nextColor, start.x, start.y, end.x, end.y,
 						paintedCells, bestSolution, maxColor, priorityMoves))
 					return true;
 			}
@@ -123,7 +122,7 @@ public class Solver {
 			return false;
 		} else {
 			boolean flag = false;
-			if (board[currentRow][currentCol] == 0) {
+			if (board[currentRow][currentCol] == -1) {
 				board[currentRow][currentCol] = color;
 				flag = true;
 				paintedCells++;
@@ -133,10 +132,10 @@ public class Solver {
 				int i = currentRow + moves[k][0];
 				int j = currentCol + moves[k][1];
 				if (i >= 0 && i < rows && j >= 0 && j < cols
-						&& ((board[i][j] == 0) || (i == endRow && j == endCol))) {
+						&& ((board[i][j] == -1) || (i == endRow && j == endCol))) {
 					if (solve(color, i, j, endRow, endCol, paintedCells,
 							bestSolution, maxColor, priorityMoves)) {
-						if(priorityMoves) {
+						if (priorityMoves) {
 							int[] backup = movesPriority[0];
 							movesPriority[0] = moves[k];
 							movesPriority[k] = backup;
@@ -146,7 +145,7 @@ public class Solver {
 				}
 			}
 			if (flag) {
-				board[currentRow][currentCol] = 0;
+				board[currentRow][currentCol] = -1;
 				paintedCells--;
 			}
 			return false;
@@ -167,27 +166,26 @@ public class Solver {
 
 	public void printBoard() {
 		for (int[] x : solvedBoard) {
-			for (int y : x)
-				System.out.printf("%2d", y);
+			for (int y : x) {
+				if(y == -1)
+					System.out.print("  ");
+				else
+					System.out.printf("%2d", y);
+			}
 			System.out.println();
 		}
 	}
-	
-	public void printTempBoard() throws InterruptedException {
-		lastFrame = new JFrame();
-		lastFrame.setSize(500, 800);
-		mainPanel.setBoard(board);
-		lastFrame.add(mainPanel);
-		mainPanel.setVisible(true);
-		lastFrame.setVisible(true);
-		Thread.sleep(50);
+
+	public void printTempBoard() {
 		for (int[] x : board) {
-			for (int y : x)
-				System.out.printf("%2d", y);
+			for (int y : x) {
+				if(y == -1)
+					System.out.print("  ");
+				else
+					System.out.printf("%2d", y);
+			}
 			System.out.println();
 		}
-		System.out.println();
-		lastFrame.setVisible(false);
 	}
 
 	public int getBoardRows() {

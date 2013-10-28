@@ -43,7 +43,7 @@ public class ReadFile {
 						count[color]++;
 					}
 				} else if ((char) c == ' ') {
-					matrix[i][j++] = 0;
+					matrix[i][j++] = -1;
 				} else if ((char) c == '\n') {
 					if (j == matrix[0].length) {
 						break;

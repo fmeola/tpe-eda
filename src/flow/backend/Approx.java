@@ -1,12 +1,15 @@
 package flow.backend;
 
-import java.io.IOException;
 import java.util.Date;
 
-public class Aprox {
+public class Approx {
 	private int bestSolutionEval;
 	private Solution bestSolution;
 	public Solver solver;
+	
+	public Approx(Solver solver) {
+		this.solver = solver;
+	}
 
 	public void solve(long maxTime) {
 		boolean better = false;
@@ -25,7 +28,7 @@ public class Aprox {
 				System.out.println();
 			} else
 				localSolution = randomSolution(solver);
-			localSolutionEval = localSolution.evaluate();
+				localSolutionEval = localSolution.evaluate();
 			do {
 				better = false;
 				for (Solution neighbor : localSolution.neighbors(solver)) {
