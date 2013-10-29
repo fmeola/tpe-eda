@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="tpe-eda" default="dist" basedir=".">
+	
+	<!-- Compila el proyecto, deja los archivos class en el directorio bin -->
+	<target name="compile">
+		<mkdir dir="bin" />
+		<javac srcdir="src" destdir="bin" classpath="lib/junit-4.7.jar" />
+	</target>
+	<!-- Crea el jar ejecutable con todo el proyecto compilado. -->
+	<target name="dist" depends="compile">
+		<jar destfile="Flow.jar" basedir="bin">
+			<manifest>
+				<attribute name="Main-Class" value="flow.FrontEnd.Game" />
+			</manifest>
+		</jar>
+	</target>
+	<!-- Borra todos los archivos generados luego de compilar. -->
+	<target name="clean">
+		<delete dir="bin" />
+		<delete file="Flow.jar" />
+	</target>
+</project>

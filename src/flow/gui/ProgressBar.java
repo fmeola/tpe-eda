@@ -20,4 +20,8 @@ public class ProgressBar {
 	public void setProgress(int progress) {
 		progressBar.setValue(progress);
 	}
+	
+	public void setString(String s){
+		progressBar.setString(s);
+	}
 }

@@ -3,6 +3,7 @@ package flow.FrontEnd;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -65,6 +66,8 @@ public class GameFrame extends JFrame {
 				- getHeight() / 2);
 		add(mainPanel);
 		mainPanel.setVisible(true);
+		setVisible(true);
+		
 		JPanel timer = new JPanel();
 		timer.setSize(cols, rows * 2 + 23);
 		BoxLayout layout = new BoxLayout(timer, BoxLayout.X_AXIS);
@@ -72,16 +75,29 @@ public class GameFrame extends JFrame {
 		progbar = new ProgressBar(timer);
 		add(timer);
 		timer.setVisible(true);
-		//long lStartTime = new Date().getTime();
-		Solver tour = new Solver(board);
-		//long lEndTime = new Date().getTime();
-		//long difference = lEndTime - lStartTime;
+		setVisible(true);
+		progbar.setProgress(0);
+
+
+		long expectedTimeOfFinish = new Date().getTime() + maxTime;
+		Solver tour = new Solver(board, progress,this, mainPanel,progbar,expectedTimeOfFinish,maxTime);
 		if (bestSolution) {
-			tour.solve(bestSolution, true);
+			long lStartTime = new Date().getTime();
+			if(!tour.solve(true, true)) {
+				System.out.println("Lo sentimos, este tablero no tiene soluci—n.");
+				return;
+			}
+			long lEndTime = new Date().getTime();
+			long difference = lEndTime - lStartTime;
+			System.out.println("Milisegundos transcurridos: " + difference);
+			progbar.setProgress(100);
+			tour.printBoard();	
 		} else {
 			Approx approx = new Approx(tour);
 			approx.solver = tour;
 			approx.solve(maxTime);
-		}
+			if(approx.getBestSolutionBoard() != null)
+				tour.printApproxBoard(approx.getBestSolutionBoard());
+		}			
 	}
 }

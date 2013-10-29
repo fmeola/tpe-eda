@@ -7,6 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JFrame;
+
+import flow.gui.BoardPanel;
+import flow.gui.ProgressBar;
+
 public class Solver {
 	private int rows;
 	private int cols;
@@ -17,13 +22,19 @@ public class Solver {
 	private int paintedCells;
 	private int[][] movesPriority = {{ 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 }};
 	private long maxTime = 0;
+	private boolean progress;
+	private JFrame frame;
+	private BoardPanel panel;
+	private ProgressBar timer;
+	private long expectedTimeOfFinish;
+	private long finishTime;
+	private long initialTime;
 
-	public Solver(int[][] startboard) {
+	public Solver(int[][] startboard, boolean progress, JFrame frame, BoardPanel panel,ProgressBar timer, long expectedTimeOfFinish, long finishTime) {
 		this.rows = startboard.length;
 		this.cols = startboard[0].length;
 		this.board = startboard;
 		this.solvedBoard = new int[rows][cols];
-
 		Map<Integer, List<Point>> colors = new HashMap<Integer, List<Point>>();
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
@@ -58,6 +69,14 @@ public class Solver {
 								}
 
 		this.paintedCells = 0;
+		this.progress=progress;
+		this.frame=frame;
+		this.panel=panel;
+		this.timer=timer;
+		this.expectedTimeOfFinish=expectedTimeOfFinish;
+		this.finishTime = finishTime;
+		this.initialTime = new Date().getTime();
+		
 	}
 
 	public boolean solve(boolean bestSolution, boolean priorityMoves) {
@@ -70,9 +89,15 @@ public class Solver {
 			if(color > max)
 				max = color;
 		}
-		return solve(min, colors.get(min).get(0).x, colors.get(min).get(0).y, colors
+		solve(min, colors.get(min).get(0).x, colors.get(min).get(0).y, colors
 				.get(min).get(1).x, colors.get(min).get(1).y, colors.size() * 2,
 				bestSolution, max, priorityMoves);
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++)
+				if(solvedBoard[i][j] != 0)
+					return true;
+		}
+		return false;
 	}
 
 	public boolean solveAprox(int color) {
@@ -97,6 +122,10 @@ public class Solver {
 		if (!priorityMoves)
 			moves = movesMap.get((int) (Math.random() * 24));
 		if (currentRow == endRow && currentCol == endCol) {
+			
+			if(progress)
+				printTempBoard(bestSolution);
+				
 			if (color < maxColor) {
 				int nextColor = color + 1;
 				while(!colors.containsKey(nextColor))
@@ -178,9 +207,37 @@ public class Solver {
 			}
 			System.out.println();
 		}
+		System.out.println();
+		panel.setBoard(solvedBoard);
+		frame.repaint();
+	}
+	
+	public void printApproxBoard(int[][] approxBoard) {
+		panel.setBoard(approxBoard);
+		frame.repaint();
 	}
 
-	public void printTempBoard() {
+	public void printTempBoard(boolean bestSolution) {
+
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+
+		if(!bestSolution){
+			float remainingTime = (expectedTimeOfFinish - new Date().getTime());
+			double percentage = 100 - (remainingTime / finishTime *100 );
+			timer.setProgress((int)percentage);
+		}else{
+			String s = (new Date().getTime() - initialTime) + " ms";
+			timer.setString(s);
+		}
+
+		panel.setBoard(board);
+		frame.repaint();
+
 		for (int[] x : board) {
 			for (int y : x) {
 				if(y == -1)
@@ -190,6 +247,7 @@ public class Solver {
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 
 	public int getBoardRows() {

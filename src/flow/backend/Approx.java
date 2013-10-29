@@ -23,7 +23,7 @@ public class Approx {
 			if (firstTime) {
 				localSolution = firstSolution(solver);
 				if(localSolution == null) {
-					System.out.println("Lo sentimos, intente con m‡s tiempo.");
+					System.out.println("No se encontr— ninguna soluci—n.");
 					return;
 				}
 				System.out.println("Soluci—n Base: " + localSolution.evaluate()
@@ -47,9 +47,7 @@ public class Approx {
 			} while (better);
 			if (localSolutionEval > bestSolutionEval) {
 				if (localSolutionEval == localSolution.getCellsSize()) {
-					System.out
-							.println("Felicitaciones!: Ha llegado a la soluci—n exacta.");
-					localSolution.printSolution();
+					System.out.println("Felicitaciones!: Ha llegado a la soluci—n exacta.");
 					return;
 				}
 				System.out.println("Mejor Soluci—n Encontrada: "
@@ -70,6 +68,12 @@ public class Approx {
 	private Solution firstSolution(Solver solver) {
 		if(solver.solve(false, true))
 			return new Solution(solver.getSolvedBoard(), solver.getPaintedCells());
+		return null;
+	}
+	
+	public int[][] getBestSolutionBoard() {
+		if(bestSolution != null)
+			return bestSolution.getBoard();
 		return null;
 	}
 

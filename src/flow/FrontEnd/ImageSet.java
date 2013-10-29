@@ -18,7 +18,7 @@ public class ImageSet {
 
 	public void FillMap() throws IOException {
 		imageMap.put(
-				0,
+				-1,
 				ImageUtils.loadImage("resources" + File.separator + "img"
 						+ File.separator + "piso.jpg"));
 		imageMap.put(
@@ -58,7 +58,7 @@ public class ImageSet {
 				ImageUtils.loadImage("resources" + File.separator + "img"
 						+ File.separator + "rosa.jpg"));
 		imageMap.put(
-				10,
+				0,
 				ImageUtils.loadImage("resources" + File.separator + "img"
 						+ File.separator + "verdeclaro.jpg"));
 	}

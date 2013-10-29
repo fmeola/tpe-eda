@@ -45,7 +45,7 @@ public class Solution {
 			auxBoard[startColor.x][startColor.y] = currentColor;
 			Point endColor = s.getEndColorPosition(currentColor);
 			auxBoard[endColor.x][endColor.y] = currentColor;
-			Solver solve = new Solver(auxBoard);
+			Solver solve = new Solver(auxBoard, false, null, null, null, 0,0);
 			solve.solveAprox(currentColor);
 			evaluate();
 			neighborsList
@@ -64,9 +64,14 @@ public class Solution {
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 
 	public int getCellsSize() {
 		return board.length * board[0].length;
+	}
+	
+	public int[][] getBoard() {
+		return board;
 	}
 }
